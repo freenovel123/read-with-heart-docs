@@ -186,7 +186,10 @@ http://localhost:3000/api/aiyue?voiceName=zh-CN-XiaoxiaoNeural&text=你好
 ```javascript linenums="1"
 
 // 请求地址
-let url = 'https://你的ip地址:3000/api/aiyue?voiceName=@{voiceType}&text=@{text}'
+
+let encodeData = encodeURIComponent('@{text}')
+
+let url = `https://你的ip地址:3000/api/aiyue?voiceName=@{voiceType}&text=${encodeData}`
 
 return {
   url,
