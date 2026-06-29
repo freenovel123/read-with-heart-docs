@@ -20,6 +20,9 @@
 | `keyword` | String | 是 | 书名搜索词 |
 | `siteJson` | String | 是 | 书源 JSON 规则串 |
 
+!!! note "书籍别名"
+    搜索调试会按 V2 规则解析 `siteJson.ruleSearch.aliasName`。该字段为空时不参与匹配；非空时，搜索结果会按书名或别名命中关键词。
+
 **请求示例：**
 
 ```http
@@ -28,7 +31,7 @@ Content-Type: application/json
 
 {
   "keyword": "斗破苍穹",
-  "siteJson": "{\"name\":\"示例书源\",\"host\":\"https://example.com\",\"search\":{...}}"
+  "siteJson": "{\"siteName\":\"示例书源\",\"host\":\"https://example.com\",\"ruleSearch\":{\"url\":\"https://example.com/search?keyword=@{keyword}\",\"bookList\":\"//div[@class='book-item']\",\"bookName\":\".//h3/text()\",\"aliasName\":\".//span[@class='alias']/text()\",\"bookAuthor\":\".//span[@class='author']/text()\",\"bookUrl\":\".//a/@href\"}}"
 }
 ```
 

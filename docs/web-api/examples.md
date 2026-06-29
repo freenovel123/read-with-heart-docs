@@ -8,7 +8,7 @@
 
 ```javascript
 // 获取书源列表
-async function getSiteList(keyword = '', groupId = '') {
+async function getSiteList(keyword = '', groupId = '', order = '') {
   const response = await fetch('http://localhost:8080/api/site/list', {
     method: 'POST',
     headers: {
@@ -16,7 +16,8 @@ async function getSiteList(keyword = '', groupId = '') {
     },
     body: JSON.stringify({
       keyword: keyword,
-      groupId: groupId
+      groupId: groupId,
+      order: order
     })
   });
 
@@ -91,13 +92,14 @@ headers = {
 }
 
 # 获取书源列表
-def get_site_list(keyword='', group_id=''):
+def get_site_list(keyword='', group_id='', order=''):
     response = requests.post(
         f'{BASE_URL}/site/list',
         headers=headers,
         json={
             'keyword': keyword,
-            'groupId': group_id
+            'groupId': group_id,
+            'order': order
         }
     )
     return response.json()
@@ -175,7 +177,8 @@ curl -X POST "http://localhost:8080/api/site/list" \
   -H "Content-Type: application/json" \
   -d '{
     "keyword": "示例",
-    "groupId": "1"
+    "groupId": "1",
+    "order": "0"
   }'
 
 # 保存书源

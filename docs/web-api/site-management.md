@@ -11,7 +11,7 @@
 
 **接口：** `POST /api/site/list`
 
-**功能：** 获取书源列表，支持搜索和分组筛选
+**功能：** 获取书源列表，支持搜索、分组筛选和排序
 
 **请求参数：**
 
@@ -19,6 +19,26 @@
 |:---|:---|:---|:---|
 | `keyword` | String | 否 | 搜索关键词（可搜索源名称/源网址） |
 | `groupId` | String | 否 | 源分组 ID |
+| `order` | String | 否 | 排序类型；不传时默认跟随 App 书源管理页当前保存的排序 |
+
+
+**`order` 取值说明：**
+
+所有排序都会先按置顶状态 `isTop` 降序排列，最后再按书源 ID 降序兜底，保证同条件下顺序稳定。
+
+| 值 | App 排序名称 | 排序规则 |
+|:---|:---|:---|
+| `0` | 默认 | 置顶优先；同置顶状态下按排序值 `index` 降序、更新时间 `updateTime` 降序 |
+| `1` | 名称降序 | 置顶优先；同置顶状态下按书源名称 `siteName` 降序 |
+| `2` | 名称升序 | 置顶优先；同置顶状态下按书源名称 `siteName` 升序 |
+| `3` | 更新时间降序 | 置顶优先；同置顶状态下按更新时间 `updateTime` 降序 |
+| `4` | 更新时间升序 | 置顶优先；同置顶状态下按更新时间 `updateTime` 升序 |
+| `5` | 创建时间降序 | 置顶优先；同置顶状态下按创建时间 `time` 降序 |
+| `6` | 创建时间升序 | 置顶优先；同置顶状态下按创建时间 `time` 升序 |
+| `7` | 源网址升序 | 置顶优先；同置顶状态下按源网址 `url` 升序 |
+
+!!! note "默认排序口径"
+    如果网页端不传 `order`，接口会读取 App 书源管理页当前保存的排序设置；如果传入未知值，则回退为 `0` 默认排序。
 
 **请求示例：**
 
@@ -28,7 +48,8 @@ Content-Type: application/json
 
 {
   "keyword": "示例",
-  "groupId": "1"
+  "groupId": "1",
+  "order": "0"
 }
 ```
 
@@ -159,6 +180,9 @@ Content-Type: application/json
 | `finderStatus` | String | 否 | 发现状态（`"1"` 启用，`"0"` 禁用） |
 | `remarks` | String | 否 | 源笔记 |
 
+!!! note "V2 规则字段"
+    `siteJson` 应提交完整 V2 规则 JSON。搜索规则里的 `siteJson.ruleSearch.aliasName` 为可选字段，含义是“书籍别名规则”；PC 写源保存接口会用完整 `siteJson` 构建 App 规则模型并保存，不会单独白名单过滤该字段。
+
 **请求示例：**
 
 ```http
@@ -166,7 +190,7 @@ POST /api/site/save
 Content-Type: application/json
 
 {
-  "siteJson": "{\"name\":\"示例书源\",\"host\":\"https://example.com\",\"search\":{...}}",
+  "siteJson": "{\"siteName\":\"示例书源\",\"host\":\"https://example.com\",\"ruleSearch\":{\"url\":\"https://example.com/search?keyword=@{keyword}\",\"bookList\":\"//div[@class='book-item']\",\"bookName\":\".//h3/text()\",\"aliasName\":\".//span[@class='alias']/text()\",\"bookAuthor\":\".//span[@class='author']/text()\",\"bookUrl\":\".//a/@href\"}}",
   "index": "100",
   "groupId": "1",
   "status": "1",

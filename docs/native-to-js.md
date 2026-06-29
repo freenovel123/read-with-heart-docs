@@ -530,7 +530,7 @@ HTML解析和操作，轻松实现数据提取和转换，遵循WHATWG HTML5 规
     | data | - | String | 编码解码内容 |
 
 
-## MD5 加密
+## MD5 哈希
 
 一种被广泛使用的密码散列函数，用于确保信息传输完整一致。
 
@@ -539,9 +539,9 @@ HTML解析和操作，轻松实现数据提取和转换，遵循WHATWG HTML5 规
     ```javascript
     let data = 'Hello, World!';
     
-    // 加密
-    let encryptData = App.md5(data);
-    App.log(encryptData); // 65a8e27d8879283831b664bd8b7f0ad4
+    // 计算哈希
+    let hashData = App.md5(data);
+    App.log(hashData); // 65a8e27d8879283831b664bd8b7f0ad4
     ```
 
 === "API"
@@ -550,13 +550,57 @@ HTML解析和操作，轻松实现数据提取和转换，遵循WHATWG HTML5 规
 
     | 参数 | 名称 | 类型 | 默认值 | 说明 |
     |:---|:---|:---|:---|:---|
-    | data | 加解密内容 | String | - | - |
+    | data | 哈希内容 | String | - | - |
 
     - 响应
 
     | 参数 | 名称 | 类型 | 说明 |
     |:---|:---|:---|:---|
-    | data | - | String | 密文 |
+    | data | - | String | 小写十六进制哈希值 |
+
+
+## SHA 哈希
+
+SHA 哈希常用于接口签名、摘要校验和防篡改校验。它和 MD5 一样是单向摘要算法，不需要密钥，也不能反向解密；返回值统一为小写十六进制字符串。
+
+=== "示例"
+
+    ```javascript
+    let data = 'abc';
+
+    let sha1Data = App.sha1(data);
+    App.log(sha1Data); // a9993e364706816aba3e25717850c26c9cd0d89d
+
+    let sha224Data = App.sha224(data);
+    App.log(sha224Data); // 23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7
+
+    let sha256Data = App.sha256(data);
+    App.log(sha256Data); // ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+
+    let sha384Data = App.sha384(data);
+    App.log(sha384Data); // cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7
+
+    let sha512Data = App.sha512(data);
+    App.log(sha512Data); // ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f
+    ```
+
+=== "API"
+
+    - 请求
+
+    | 方法 | 名称 | 类型 | 默认值 | 说明 |
+    |:---|:---|:---|:---|:---|
+    | App.sha1(data) | SHA1 哈希 | String | - | 传入待哈希内容 |
+    | App.sha224(data) | SHA224 哈希 | String | - | 传入待哈希内容 |
+    | App.sha256(data) | SHA256 哈希 | String | - | 传入待哈希内容 |
+    | App.sha384(data) | SHA384 哈希 | String | - | 传入待哈希内容 |
+    | App.sha512(data) | SHA512 哈希 | String | - | 传入待哈希内容 |
+
+    - 响应
+
+    | 参数 | 名称 | 类型 | 说明 |
+    |:---|:---|:---|:---|
+    | data | - | String | 小写十六进制哈希值 |
 
 
 ## AES 加解密

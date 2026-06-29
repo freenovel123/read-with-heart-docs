@@ -4,24 +4,25 @@
 
 ```javascript
 const siteJson = JSON.stringify({
-  name: "示例书源",
+  siteName: "示例书源",
   host: "https://example.com",
-  search: {
+  ruleSearch: {
     url: "https://example.com/search?keyword=@{keyword}",
-    list: "//div[@class='book-item']",
-    name: "//h3/text()",
-    author: "//span[@class='author']/text()",
+    bookList: "//div[@class='book-item']",
+    bookName: ".//h3/text()",
+    aliasName: ".//span[@class='alias']/text()",
+    bookAuthor: ".//span[@class='author']/text()",
     bookUrl: "//a/@href"
   },
-  catalog: {
+  ruleChapter: {
     url: "@{bookUrl}/catalog",
-    list: "//div[@class='chapter']/a",
-    name: "/text()",
-    url: "/@href"
+    chapterList: "//div[@class='chapter']/a",
+    chapterName: "./text()",
+    chapterUrl: "./@href"
   },
-  content: {
+  ruleContent: {
     url: "@{chapterUrl}",
-    content: "//div[@id='content']/text()"
+    contents: "//div[@id='content']/text()"
   }
 });
 
@@ -66,7 +67,9 @@ console.log('正文内容:', contentResult.data.resultData);
 
 ```javascript
 // 获取书源列表
-const list = await getSiteList('示例', '1');
+// 第三个参数 order 可选；不传时跟随 App 书源管理页当前排序，
+// 传 "0" 表示默认排序，传 "1"~"7" 可指定名称/时间/网址等排序。
+const list = await getSiteList('示例', '1', '0');
 
 // 获取书源详情
 const detail = await fetch('http://localhost:8080/api/site/info', {
