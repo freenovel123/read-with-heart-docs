@@ -179,3 +179,4 @@ HTML 响应可以把 `response.engine` 设置为 `css`，`put` 中的 value 使�
 - 原有 `xpath`、`jsonpath` 规则不受影响；只有把规则段 `engine` 改成 `css` 时才走 CSS 解析。
 - `@href`、`@src` 只负责取属性值，最终 URL 仍会按 App 原有逻辑结合书源 `host` 做地址补全。
 - CSS 解析只在选择 `engine: css` 的规则段中生效。
+- CSS 基础规则后可以继续写 `<js>...</js>` 或 `##正则`；组合规则的输入和执行顺序见[字段规则执行流水线](rules-Introduction.md#field-rule-pipeline)。

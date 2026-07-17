@@ -125,3 +125,4 @@ XPath 规则最终会返回字符串：
 - 列表字段选中的是每个列表项，列表项内部字段建议使用相对 XPath，如 `.//a/text()`。
 - HTML 响应用 `xpath` 或 `css`；JSON 响应不要用 XPath。
 - XPath 规则取到的相对 URL 会继续走 App 的地址补全逻辑。
+- XPath 后可以继续写 `<js>...</js>` 或 `##正则`；组合规则的输入和执行顺序见[字段规则执行流水线](rules-Introduction.md#field-rule-pipeline)。

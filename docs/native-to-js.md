@@ -1,6 +1,9 @@
 # Native to Javascript
 App暴露的Javascript方法，可以使用这些方法调用原生的组件！
 
+!!! info "本页边界"
+    本页只列出 `App.*` / `app.*` / `APP.*` Native 方法，不定义字段规则的解析顺序。字段级 `<js>...</js>` 的 `value`、`${value}`、空结果回退及 JS/正则书写顺序见[字段规则执行流水线](制作源/rules-Introduction.md#field-rule-pipeline)。响应处理中的 `@js:` 见[响应处理 - Javascript 规则](制作源/response.md)。
+
 !!! note "命名规范说明"
     文档中的方法支持多种命名格式，以下三种写法等价：
     
