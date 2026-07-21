@@ -128,3 +128,4 @@ JSON 响应可以把 `response.engine` 设置为 `jsonpath`，`put` 中的 value
 - `bookList`、`chapterList` 等列表字段通常要指向数组。
 - 列表项内部字段建议写成 `$.字段名`，避免和整页根对象查询混淆。
 - `@all` 可用于返回当前 JSON 原文或当前对象内容，配合正则或 JS 做进一步处理。
+- JSONPath 后可以继续写 `<js>...</js>` 或 `##正则`；组合规则的输入和执行顺序见[字段规则执行流水线](rules-Introduction.md#field-rule-pipeline)。
