@@ -87,6 +87,24 @@
 | openParams | 开放参数当前生效值的扁平字典 | `config.openParams` | 详见 [openParams 开放参数](#openparams) |
 | verifyCode | 验证码 | `config.verifyCode` |  |
 
+### 请求头与登录 Cookie 规则
+
+书源顶层 `header` 是公共请求头。搜索、详情、目录、正文、发现以及前置请求会按当前请求类型二选一：
+
+- 当前请求的 `header` 非空：只使用当前请求 Header。
+- 当前请求的 `header` 为空：完整回退到顶层公共 `header`。
+- 两者不会逐字段合并，因此当前请求一旦配置 Header，就需要自行写全该请求所需字段。
+
+段评 `ident` 中附带的 Header 非空时同样独占；未附带时回退公共 Header。章评沿用正文 Header 的选择结果。
+
+登录完成后保存的 `loginCookies` 会在未禁用 Cookie 时自动加入正式请求、分页请求、前置请求、段评和章评。Cookie 同名冲突按以下优先级处理：
+
+```text
+请求显式 Cookie > 登录 Cookie > HTTP Cookie 缓存
+```
+
+设置 `forbidCookie: true` 后，不自动注入登录 Cookie 和缓存 Cookie；请求 Header 中显式填写的 Cookie 仍属于当前请求自己的 Header。
+
 ### 编辑器可写 `config.*` 键总表
 
 下表汇总当前代码编辑器中实际可补全的 `config.*` 键（具体可补全项以编辑器为准）：
@@ -116,6 +134,62 @@
 | `config.verifyCode` | 验证码值 |
 | `config.siteName` | 当前书源名称 |
 
+### 地址如何传到下一场景
+
+先记住一个原则：**规则字段负责解析地址，进入下一场景后会换成该场景的 `config` 字段；首屏真正请求的地址放在 `config.url`。**
+
+#### 1. 搜索 → 详情
+
+```text
+搜索规则 bookUrl
+        ↓
+详情 config.infoUrl       保存搜索解析出的详情地址或书籍 ID
+        ↓
+详情 config.url           首屏请求地址，初始等于 infoUrl
+```
+
+例如搜索的 `bookUrl` 只解析出书籍 ID `12345`，进入详情后应通过 `config.infoUrl` 读取它；详情 `request @js:` 再根据这个 ID 生成真正的 `config.url`。
+
+#### 2. 详情 → 章节列表
+
+```text
+详情规则 chapterListUrl
+        ↓
+章节列表 config.bookUrl   保存详情解析出的章节列表地址
+        ↓
+章节列表 config.url       首屏请求地址，初始等于 bookUrl
+```
+
+如果详情没有配置 `chapterListUrl`，或没有解析出值，章节列表地址会回退为详情地址。
+
+#### 3. 章节列表 → 正文
+
+```text
+章节规则 chapterUrl
+        ↓
+正文 config.chapterUrl    保存当前章节的正文地址
+        ↓
+正文 config.url           首屏请求地址，初始等于 chapterUrl
+```
+
+这里的 `chapterUrl` 是**每个章节条目的正文地址**，不是章节列表自身的请求地址。
+
+#### 首屏与分页分别改哪个字段
+
+| 场景 | 首屏正式请求 | 分页请求 |
+| --- | --- | --- |
+| 详情 | 使用 `config.url` | 无内置详情分页 |
+| 章节列表 | 使用 `config.url` | `config.nextUrl` 优先；为空时使用 `config.bookUrl` |
+| 正文 | 使用 `config.url` | `config.chapterUrl` 优先；为空时使用 `config.url` |
+
+编写 `request @js:` 时可以直接按下面判断：
+
+1. **修改首屏请求地址**：改 `config.url`。
+2. **修改章节列表分页地址**：改 `config.nextUrl` 或 `config.bookUrl`；只改 `config.url` 不会改变分页请求。
+3. **修改正文分页地址**：改 `config.chapterUrl`；当它非空时，分页不会使用 `config.url`。
+
+`infoUrl`、`bookUrl`、`chapterUrl` 是跨场景保留的上下文地址，`url` 是当前首屏请求地址。修改其中一个字段不会自动同步覆盖其他字段。
+
 ### 搜索规则
 
 | 参数名称 | 说明 | 用例 |
@@ -126,12 +200,30 @@
 | bookName | 书籍名称 | `config.bookName` |
 | aliasName | 书籍别名，可选，用于解析又名、原名、译名等额外书名，并参与搜索书名匹配 | 规则字段，解析结果写入书籍扩展名并参与匹配 |
 | bookAuthor | 作者 | `config.bookAuthor` |
-| bookUrl | 书籍详情地址，跨场景保留原始值，发起详情/目录请求时按 [host 自动补全](#request-url-host) | `config.bookUrl` |
+| bookUrl | 解析书籍详情地址或书籍 ID；结果进入详情场景的 `config.infoUrl` | 详情中读取 `config.infoUrl` |
 | pageIndex | 当前页码 | `config.pageIndex` |
 
 `ruleSearch.aliasName` 是可选的书籍别名解析规则，适合解析站点返回的又名、原名、译名等额外书名，并参与搜索书名匹配。别名规则为空或解析结果为空时不会参与匹配；有值时，搜索结果筛选和精准/包含分组会按 `bookName OR aliasName` 判断，任意一个命中关键词即可匹配。非空别名会作为搜索结果和加入书架后的显示书名使用。
 
 ### 详情规则
+
+| 参数名称 | 说明 | 用例 |
+| --- | --- | --- |
+| infoUrl | 当前书籍详情地址；为空时使用搜索或发现结果中的书籍原始地址 | `config.infoUrl` |
+| url | 本次详情请求地址，初始值与 `infoUrl` 相同；支持 [host 自动补全](#request-url-host) | `config.url` |
+| bookName | 书籍名称；详情解析结果非空时覆盖搜索或发现结果 | `config.bookName` |
+| bookAuthor | 作者；详情解析结果非空时覆盖搜索或发现结果 | `config.bookAuthor` |
+| chapterListUrl | 章节列表地址；相对地址会按当前 `host` 自动补全 | `ruleBookInfo.chapterListUrl` |
+| coverUrl | 封面地址，兼容旧字段 `imageUrl` | `ruleBookInfo.ruleExtra.coverUrl` |
+| bookSize | 书籍字数或大小 | `ruleBookInfo.ruleExtra.bookSize` |
+| lastUpdateTime | 最近更新时间 | `ruleBookInfo.ruleExtra.lastUpdateTime` |
+| lastChapterName | 最新章节名称 | `ruleBookInfo.ruleExtra.lastChapterName` |
+| introduce | 书籍简介 | `ruleBookInfo.ruleExtra.introduce` |
+| classify | 书籍分类 | `ruleBookInfo.ruleExtra.classify` |
+| status | 连载、完结等状态 | `ruleBookInfo.ruleExtra.status` |
+| importUrl | 导入书籍地址时使用的 URL 匹配或转换规则 | `ruleBookInfo.importUrl` |
+
+详情字段属于普通字段规则，JS 后处理使用 `<js>...</js>`；详情规则中的 `request` 与 `response` 是两个独立入口，只使用 `@js:`。如果详情规则整体为空，App 会保留搜索或发现阶段已有的书籍信息并继续后续流程。
 
 ### 章节列表规则
 
@@ -215,13 +307,13 @@ APP内置了各种常用的表达式，可以进行替换获取和处理操作�
 
 | 参数 | 名称 | 示例 | 说明 |
 | --- | --- | --- | --- |
-| `${}` | 获取参数 | `${key}` | 支持获取json的子集`${info.name}`；值为空时保留原文 |
-| `@{}` | 获取参数 | `@{key}` | 支持获取json的子集`@{info.name}`；值为空时替换为空字符串 |
+| `${}` | 获取参数（兼容语法） | `${key}` | 支持读取子路径 `${info.name}`；参数替换没有匹配到值时，进入下一步 JS 执行 |
+| `@{}` | 获取参数（确定替换） | `@{key}` | 支持读取子路径 `@{info.name}`；参数替换没有匹配到值时立即置空 |
 | `{{}}` | 运行规则 | `{{}}` | 可以运行当前引擎对应的 xpath、jsonpath、css 规则；`css` 段内不建议写 XPath |
 | `@get{}` | 获取put信息 | `@get{name}` | 可以获取`@put{}`的数据 |
 | `@put{}` | 保存信息 | `@put{name, '//*[@src]'}` | 目前只支持前置请求的put |
-| `<js></js>` | 字段 JS 后处理 | `<js>return value;</js>` | 通过 `value` 接收原文、基础提取结果或上一步结果 |
-| `@js:` | JS语言处理 | @js:<br/>let name = '张三';<br/>App.log(name); | 在规则中第一行添加`@js:`表示该规则使用js运行 |
+| `<js></js>` | 字段 JS 后处理 | `<js>return value;</js>` | 可用于 URL 和各种普通规则字段，但不能用于 `request`、`response`；通过 `value` 接收原文、基础提取结果或上一步结果 |
+| `@js:` | 请求 / 响应 JS | `@js:return html;` | 只用于 `request` 和 `response` 两个规则字段，不能代替普通字段中的 `<js>` |
 | `@all` | 获取网页所有内容 | `@all<js>return value;</js>` | 跳过基础解析，直接把网页原文交给后处理 |
 | `##正则表达式#替换字符` | 正则替换 | `##a#b` | 替换一次 |
 | `##正则表达式##替换字符` | 正则替换 | `##a##b` | 替换所有 |
@@ -309,8 +401,8 @@ function jsFun(value, config) {
 
 正则步骤只处理上一步结果，不会在执行到一半时重新读取原始内容。正则编译失败时保留输入值。
 
-!!! note "字段 JS 与响应 JS 不是同一个入口"
-    本节说明字段规则中的 `<js>...</js>`，参数是 `value` 和 `config`。响应处理中的 `@js:` 使用 `html` 和 `config`，详见[响应处理 - Javascript 规则](response.md)。Native 方法列表见 [Native to Javascript](../native-to-js.md)。
+!!! note "字段 JS 与请求 / 响应 JS 不是同一个入口"
+    `<js>...</js>` 用于 URL 和其他普通字段，参数是 `value` 和 `config`，但不能用于 `request`、`response`。`request` 与 `response` 只使用 `@js:`：请求 JS 负责修改请求配置，响应 JS 使用 `html` 和 `config` 在字段提取前处理原始响应。响应入口详见[响应处理 - Javascript 规则](response.md)，Native 方法列表见 [Native to Javascript](../native-to-js.md)。
 
 ## URL规则
 

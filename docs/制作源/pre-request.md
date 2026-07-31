@@ -158,6 +158,18 @@
 }
 ```
 
+### Header 与登录 Cookie
+
+第一个前置请求的 Header 遵循与正式请求一致的二选一规则：
+
+- 前置请求自身 `header` 非空时，只使用前置请求 Header。
+- 前置请求自身 `header` 为空时，回退书源顶层公共 `header`。
+- 公共 Header 不会逐字段补入已配置的前置请求 Header。
+
+只要 `forbidCookie` 为 `false`，登录流程保存的 `loginCookies` 会自动合并到前置请求，后续前置请求继续继承前一步产生的 Cookie。冲突优先级为“请求显式 Cookie > 登录 Cookie > HTTP Cookie 缓存”。
+
+`forbidCookie: true` 会关闭登录 Cookie 和缓存 Cookie 的自动注入。
+
 ## 三类典型前置请求
 
 ### 常规请求
