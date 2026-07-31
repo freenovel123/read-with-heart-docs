@@ -12,7 +12,7 @@
 | --- | --- |
 | `ruleSearch` | 搜索前先获取加密参数、token、Cookie |
 | `ruleBookInfo` | 详情页请求前先获取入口参数 |
-| `ruleChapter` | 章节列表请求前先获取目录接口参数 |
+| `ruleChapter` | 章节列表请求前先获取章节列表接口参数 |
 | `ruleContent` | 正文请求前先获取章节正文、播放地址或校验参数 |
 | `ruleFinder` | 发现页请求前先获取筛选接口所需参数 |
 
@@ -160,11 +160,15 @@
 
 ### Header 与登录 Cookie
 
-第一个前置请求的 Header 遵循与正式请求一致的二选一规则：
+前置请求的 Header 继承关系：
 
-- 前置请求自身 `header` 非空时，只使用前置请求 Header。
-- 前置请求自身 `header` 为空时，回退书源顶层公共 `header`。
-- 公共 Header 不会逐字段补入已配置的前置请求 Header。
+1. **第一个前置请求有自己的 `header`**：使用该前置请求 Header。
+2. **第一个前置请求没有 `header`**：继承书源顶层公共 `header`。
+3. **后续前置请求有自己的 `header`**：使用当前前置请求 Header，并更新后续请求继承的请求上下文。
+4. **后续前置请求没有 `header`**：继续继承上一个前置请求的 Header 上下文。
+5. **前置请求结束后进入正式请求**：正式请求仍按自己的场景 Header 规则选择，前置请求 Header 仅作为没有同名字段时的补充上下文。
+
+公共 Header 不会逐字段补入一个已经配置自身 Header 的前置请求。完整的场景继承关系见[请求头继承关系列表](rules-Introduction.md#request-header-inheritance)。
 
 只要 `forbidCookie` 为 `false`，登录流程保存的 `loginCookies` 会自动合并到前置请求，后续前置请求继续继承前一步产生的 Cookie。冲突优先级为“请求显式 Cookie > 登录 Cookie > HTTP Cookie 缓存”。
 

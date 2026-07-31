@@ -79,7 +79,7 @@
 | engine | 源引擎类型 | `config.engine` | xpath、jsonpath、css |
 | method | 请求类型 | `config.method` | POST，GET |
 | host | 站点地址 | `config.host` |  |
-| header | 请求头 | `config.header` | 优先级别：正式请求头&gt;浏览器过盾请求头&gt;公共请求头 |
+| header | 请求头 | `config.header` | 继承关系见[请求头继承关系列表](#request-header-inheritance) |
 | mode | 请求模式 | `config.mode` | http、webview |
 | requestEncode | 请求编码方式 | `config.requestEncode` | utf-8、gbk |
 | responseEncode | 响应编码方式 | `config.responseEncode` | utf-8、gbk |
@@ -87,15 +87,32 @@
 | openParams | 开放参数当前生效值的扁平字典 | `config.openParams` | 详见 [openParams 开放参数](#openparams) |
 | verifyCode | 验证码 | `config.verifyCode` |  |
 
-### 请求头与登录 Cookie 规则
+<span id="request-header-inheritance"></span>
 
-书源顶层 `header` 是公共请求头。搜索、详情、目录、正文、发现以及前置请求会按当前请求类型二选一：
+### 请求头继承关系列表
 
-- 当前请求的 `header` 非空：只使用当前请求 Header。
-- 当前请求的 `header` 为空：完整回退到顶层公共 `header`。
-- 两者不会逐字段合并，因此当前请求一旦配置 Header，就需要自行写全该请求所需字段。
+书源顶层 `header` 是公共请求头。各类请求按下表选择最终 Header：
 
-段评 `ident` 中附带的 Header 非空时同样独占；未附带时回退公共 Header。章评沿用正文 Header 的选择结果。
+| 请求类型 | Header 应有行为 | 场景 Header 非空 | 场景 Header 为空 |
+| --- | --- | --- | --- |
+| 搜索正式请求 | 搜索 Header 与公共 Header 二选一 | 使用 `ruleSearch.header` | 回退公共 `header` |
+| 书籍信息正式请求 | 信息 Header 与公共 Header 二选一 | 使用 `ruleBookInfo.header` | 回退公共 `header` |
+| 章节列表正式请求 | 章节列表 Header 与公共 Header 二选一 | 使用 `ruleChapter.header` | 回退公共 `header` |
+| 正文正式请求 | 正文 Header 与公共 Header 二选一 | 使用 `ruleContent.header` | 回退公共 `header` |
+| 发现正式请求 | 当前发现 Header 与公共 Header 二选一 | 使用当前发现规则 `header` | 回退公共 `header` |
+| 搜索分页 | 继承搜索正式请求 Header | 沿用搜索已选 Header | 沿用搜索已选 Header |
+| 章节列表分页 | 继承章节列表正式请求 Header | 沿用章节列表已选 Header | 沿用章节列表已选 Header |
+| 正文分页 | 继承正文正式请求 Header | 沿用正文已选 Header | 沿用正文已选 Header |
+| 第一个前置请求 | 前置 Header 与公共 Header 二选一 | 使用当前前置请求 `header` | 回退公共 `header` |
+| 后续前置请求 | 当前前置 Header 优先，否则继承前一步上下文 | 使用当前前置请求 `header` | 继承上一个前置请求 Header |
+| 前置后正式请求 | 正式场景 Header 优先，前置 Header 仅补充缺失字段 | 使用正式场景 Header，保留前置新增字段 | 使用公共 Header，保留前置新增字段 |
+| 段评页面 | `ident` Header 与公共 Header 二选一 | 使用 `ident` Header | 回退公共 `header` |
+| 章评页面 | 继承正文请求已经选定的 Header | 沿用正文已选 Header | 沿用正文已选 Header |
+
+!!! warning "不是逐字段合并"
+    场景 Header 与公共 Header 是二选一关系。只要场景 Header 非空，公共 Header 就不会补入其中；请在场景 Header 中写全该请求所需字段。前置请求完成后新增的 Header 字段属于前置请求上下文，不等同于公共 Header 合并。
+
+### 登录 Cookie 规则
 
 登录完成后保存的 `loginCookies` 会在未禁用 Cookie 时自动加入正式请求、分页请求、前置请求、段评和章评。Cookie 同名冲突按以下优先级处理：
 
@@ -422,7 +439,7 @@ function jsFun(value, config) {
 | host 带路径且相对地址有重叠 | `host = https://example.com/book/123`<br/>`url = /book/123/chapter/1` | `https://example.com/book/123/chapter/1`，避免重复拼成 `/book/123/book/123/...` |
 | request JS 修改 host | `request @js` 中修改 `config.host` 后返回相对 `config.url` | 正式请求会先执行 `request @js`，再用最终 `config.host` 补全 `config.url` |
 | 前置请求 | 前置请求 `url` 写 `/token`，或前置请求 `request @js` 修改 `host` | 会按当前运行时 `host` 自动补全；JS 修改后会按修改后的 `host` 再补全一次 |
-| 跨场景地址 | 搜索 / 发现解析出的 `bookUrl`，章节列表解析出的 `chapterUrl` | V2 会先保留原始值，等详情 / 目录 / 正文请求阶段再按运行时 `host` 补全 |
+| 跨场景地址 | 搜索 / 发现解析出的 `bookUrl`，章节列表解析出的 `chapterUrl` | V2 会先保留原始值，等详情 / 章节列表 / 正文请求阶段再按运行时 `host` 补全 |
 | 当前场景立即消费的地址 | 封面 `coverUrl`、详情里的章节列表地址、章节 / 正文分页 `next`、正文 `playUrl` | 会在当前场景内补成可请求地址 |
 
 如果规则直接返回 `#` 或返回内容和规则原文完全相同，App 会把它视为空地址。`www.example.com` 这类不带协议的地址会保留原样，不会强行补 `https://`。
