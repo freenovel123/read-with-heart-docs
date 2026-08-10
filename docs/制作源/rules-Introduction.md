@@ -212,7 +212,7 @@
 各场景的输入参数、规则字段、地址传递和最小示例已拆分到独立页面：
 
 - [搜索规则](rule-search.md)：`ruleSearch`
-- [详情规则](rule-detail.md)：`ruleBookInfo`
+- [详情规则](rule-detail.md)：`ruleBookInfo`，包括 `toolsUrl` 书籍工具地址
 - [章节规则](rule-chapter.md)：`ruleChapter`
 - [正文规则](rule-content.md)：`ruleContent`，包括 `commentUrl` 章节评论地址
 
