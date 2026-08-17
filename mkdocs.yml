@@ -30,6 +30,10 @@ nav:
       - 图片: content-richtext/image.md
       - 段评: content-richtext/comment.md
       - 批注: content-richtext/note.md
+  - 美化:
+    - 段评样式: beautify/comment-style.md
+    - 高亮样式: beautify/read-text-style.md
+    - 正文头样式: beautify/header-style.md
   - 自定义TTS: rules-tts.md
   - 制作源:
     - 关于制作源: 制作源/about.md
