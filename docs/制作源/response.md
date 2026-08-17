@@ -4,7 +4,7 @@
 在每次请求后的响应中都会返回2个参数，参数一：html（json）内容，参数二：config。可以在源编辑的响应信息中使用js进行处理，获取相应的值。
 
 !!! note "与字段级 JS 的区别"
-    本页说明响应处理中的 `@js:`，参数是 `html` 和 `config`。字段规则中的 `<js>...</js>` 参数是 `value` 和 `config`，并会与正则按书写顺序执行，详见[字段规则执行流水线](rules-Introduction.md#field-rule-pipeline)。
+    本页说明 `response` 字段专用的 `@js:`，参数是 `html` 和 `config`。`@js:` 只用于 `request`、`response` 两个规则字段；URL、书名、作者、列表、正文等普通字段需要运行 JS 时使用 `<js>...</js>`。字段级 `<js>` 的参数是 `value` 和 `config`，并会与正则按书写顺序执行，详见[字段规则执行流水线](rules-Introduction.md#field-rule-pipeline)。
 
 由于app使用的是原生的写法，故采用最了基础的JS写法，不支持浏览器中的一些写法以及Node.js的写法，所以我们内置了一些比如像浏览器中操作Document的方法等。
 

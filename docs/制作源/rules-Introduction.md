@@ -207,67 +207,14 @@
 
 `infoUrl`、`bookUrl`、`chapterUrl` 是跨场景保留的上下文地址，`url` 是当前首屏请求地址。修改其中一个字段不会自动同步覆盖其他字段。
 
-### 搜索规则
+## 场景规则
 
-| 参数名称 | 说明 | 用例 |
-| --- | --- | --- |
-| keyword | 搜索关键词 | `config.keyword` |
-| url | 搜索地址，支持 [host 自动补全](#request-url-host) | `config.url` |
-| bookList | 搜索结果列表 | 规则字段，不写入 `config` |
-| bookName | 书籍名称 | `config.bookName` |
-| aliasName | 书籍别名，可选，用于解析又名、原名、译名等额外书名，并参与搜索书名匹配 | 规则字段，解析结果写入书籍扩展名并参与匹配 |
-| bookAuthor | 作者 | `config.bookAuthor` |
-| bookUrl | 解析书籍详情地址或书籍 ID；结果进入详情场景的 `config.infoUrl` | 详情中读取 `config.infoUrl` |
-| pageIndex | 当前页码 | `config.pageIndex` |
+各场景的输入参数、规则字段、地址传递和最小示例已拆分到独立页面：
 
-`ruleSearch.aliasName` 是可选的书籍别名解析规则，适合解析站点返回的又名、原名、译名等额外书名，并参与搜索书名匹配。别名规则为空或解析结果为空时不会参与匹配；有值时，搜索结果筛选和精准/包含分组会按 `bookName OR aliasName` 判断，任意一个命中关键词即可匹配。非空别名会作为搜索结果和加入书架后的显示书名使用。
-
-### 详情规则
-
-| 参数名称 | 说明 | 用例 |
-| --- | --- | --- |
-| infoUrl | 当前书籍详情地址；为空时使用搜索或发现结果中的书籍原始地址 | `config.infoUrl` |
-| url | 本次详情请求地址，初始值与 `infoUrl` 相同；支持 [host 自动补全](#request-url-host) | `config.url` |
-| bookName | 书籍名称；详情解析结果非空时覆盖搜索或发现结果 | `config.bookName` |
-| bookAuthor | 作者；详情解析结果非空时覆盖搜索或发现结果 | `config.bookAuthor` |
-| chapterListUrl | 章节列表地址；相对地址会按当前 `host` 自动补全 | `ruleBookInfo.chapterListUrl` |
-| coverUrl | 封面地址，兼容旧字段 `imageUrl` | `ruleBookInfo.ruleExtra.coverUrl` |
-| bookSize | 书籍字数或大小 | `ruleBookInfo.ruleExtra.bookSize` |
-| lastUpdateTime | 最近更新时间 | `ruleBookInfo.ruleExtra.lastUpdateTime` |
-| lastChapterName | 最新章节名称 | `ruleBookInfo.ruleExtra.lastChapterName` |
-| introduce | 书籍简介 | `ruleBookInfo.ruleExtra.introduce` |
-| classify | 书籍分类 | `ruleBookInfo.ruleExtra.classify` |
-| status | 连载、完结等状态 | `ruleBookInfo.ruleExtra.status` |
-| importUrl | 导入书籍地址时使用的 URL 匹配或转换规则 | `ruleBookInfo.importUrl` |
-
-详情字段属于普通字段规则，JS 后处理使用 `<js>...</js>`；详情规则中的 `request` 与 `response` 是两个独立入口，只使用 `@js:`。如果详情规则整体为空，App 会保留搜索或发现阶段已有的书籍信息并继续后续流程。
-
-### 章节列表规则
-
-| 参数名称 | 说明 | 用例 |
-| --- | --- | --- |
-| bookUrl | 章节列表 URL，支持 [host 自动补全](#request-url-host) | `config.bookUrl` |
-| infoUrl | 书籍信息 URL，支持 [host 自动补全](#request-url-host) | 如果书籍详情有规则，会先调用`infoUrl`请求，并获取`bookUrl` |
-| bookName | 书籍名称 | `config.bookName` |
-| bookAuthor | 作者 | `config.bookAuthor` |
-| url | 章节列表请求地址，支持 [host 自动补全](#request-url-host) | `config.url` |
-| pageIndex | 页码 | `config.pageIndex` |
-| pageStart | 起始章节页数（老版本参数不建议使用） | 用于章节规则拼接，如第二章起，标记2 |
-
-### 正文规则
-
-| 参数名称 | 说明 | 用例 |
-| --- | --- | --- |
-| bookUrl | 章节列表 URL，支持 [host 自动补全](#request-url-host) | `config.bookUrl` |
-| bookName | 书籍名称 | `config.bookName` |
-| bookAuthor | 作者 | `config.bookAuthor` |
-| chapterUrl | 章节详情 URL，跨场景保留原始值，发起正文请求时按 [host 自动补全](#request-url-host) | `config.chapterUrl` |
-| infoUrl | 书籍详情 URL，支持 [host 自动补全](#request-url-host) | `config.infoUrl` |
-| chapterName | 章节名称 | `config.chapterName` |
-| url | 正文请求地址，支持 [host 自动补全](#request-url-host) | `config.url` |
-| pageIndex | 页码 | `config.pageIndex` |
-| pageStart | 起始章节页数（老版本参数不建议使用） | 用于正文规则拼接，如第二章起，标记2 |
-| playUrl | 播放地址，支持 [host 自动补全](#request-url-host)；如果`playUrl`规则为空，自动获取正文url和正文header | `config.playUrl` |
+- [搜索规则](rule-search.md)：`ruleSearch`
+- [详情规则](rule-detail.md)：`ruleBookInfo`，包括 `toolsUrl` 书籍工具地址
+- [章节规则](rule-chapter.md)：`ruleChapter`
+- [正文规则](rule-content.md)：`ruleContent`，包括 `commentUrl` 章节评论地址
 
 ### 发现规则
 

@@ -22,6 +22,7 @@ markdown_extensions:
       alternate_style: true
 nav:
   - 首页: index.md
+  - 更新日志: changelog.md
   - 正文富文本:
     - 概述: content-richtext/index.md
     - 基础样式: content-richtext/basic.md
@@ -29,11 +30,20 @@ nav:
       - 图片: content-richtext/image.md
       - 段评: content-richtext/comment.md
       - 批注: content-richtext/note.md
+  - 美化:
+    - 段评样式: beautify/comment-style.md
+    - 高亮样式: beautify/read-text-style.md
+    - 正文头样式: beautify/header-style.md
   - 自定义TTS: rules-tts.md
   - 制作源:
     - 关于制作源: 制作源/about.md
     - 前置请求: 制作源/pre-request.md
-    - 规则说明: 制作源/rules-Introduction.md
+    - 规则说明:
+      - 概述: 制作源/rules-Introduction.md
+      - 搜索: 制作源/rule-search.md
+      - 详情: 制作源/rule-detail.md
+      - 章节: 制作源/rule-chapter.md
+      - 正文: 制作源/rule-content.md
     - 响应 JS 规则: 制作源/response.md
     - Native JS API: native-to-js.md
     - XPath规则: 制作源/rule-xpath.md
