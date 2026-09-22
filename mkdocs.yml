@@ -44,7 +44,8 @@ nav:
       - 详情: 制作源/rule-detail.md
       - 章节: 制作源/rule-chapter.md
       - 正文: 制作源/rule-content.md
-    - 响应 JS 规则: 制作源/response.md
+      - 请求信息: 制作源/request.md
+      - 响应信息: 制作源/response.md
     - Native JS API: native-to-js.md
     - XPath规则: 制作源/rule-xpath.md
     - JSONPath规则: 制作源/rule-jsonpath.md

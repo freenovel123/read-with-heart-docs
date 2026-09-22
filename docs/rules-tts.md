@@ -1,5 +1,10 @@
 # 自定义TTS
 
+TTS 将文字合成为语音；播放已有章节音频属于听书源，二者使用不同的规则入口。
+
+!!! warning "CENC 配置归属修正"
+    CENC 章节音频解密属于听书源，不属于 TTS，请参阅[听书源 CENC 加密音频](制作源/rule-content.md#play-url-cenc)。请勿在 TTS 返回值中配置 `decrypt`；普通 HTTP / WebSocket TTS 的配置方式不变。CENC 功能的可用状态以听书源说明为准。
+
 ## 请求处理
 
 ### 表达式

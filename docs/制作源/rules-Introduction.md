@@ -71,6 +71,8 @@
 - `unicode.decode()` 等同于 `App.unicode.decode()`
 - 更多 Native to Javascript 方法请参考[Native to Javascript](../native-to-js.md)文档
 
+<span id="builtin-request-params"></span>
+
 ### 公共内置请求参数
 
 | 参数名称 | 说明 | 用例 | 值类型示例 |
@@ -207,6 +209,8 @@
 
 `infoUrl`、`bookUrl`、`chapterUrl` 是跨场景保留的上下文地址，`url` 是当前首屏请求地址。修改其中一个字段不会自动同步覆盖其他字段。
 
+`request @js:` 的触发条件、`config` 可写字段、返回值合并规则和完整案例见[请求信息](request.md)。
+
 ## 场景规则
 
 各场景的输入参数、规则字段、地址传递和最小示例已拆分到独立页面：
@@ -277,7 +281,7 @@ APP内置了各种常用的表达式，可以进行替换获取和处理操作�
 | `@get{}` | 获取put信息 | `@get{name}` | 可以获取`@put{}`的数据 |
 | `@put{}` | 保存信息 | `@put{name, '//*[@src]'}` | 目前只支持前置请求的put |
 | `<js></js>` | 字段 JS 后处理 | `<js>return value;</js>` | 可用于 URL 和各种普通规则字段，但不能用于 `request`、`response`；通过 `value` 接收原文、基础提取结果或上一步结果 |
-| `@js:` | 请求 / 响应 JS | `@js:return html;` | 只用于 `request` 和 `response` 两个规则字段，不能代替普通字段中的 `<js>` |
+| `@js:` | 请求 / 响应 JS | `@js:return html;` | 只用于 `request` 和 `response` 两个规则字段，不能代替普通字段中的 `<js>`；详见[请求信息](request.md)、[响应信息](response.md) |
 | `@all` | 获取网页所有内容 | `@all<js>return value;</js>` | 跳过基础解析，直接把网页原文交给后处理 |
 | `##正则表达式#替换字符` | 正则替换 | `##a#b` | 替换一次 |
 | `##正则表达式##替换字符` | 正则替换 | `##a##b` | 替换所有 |
@@ -366,7 +370,7 @@ function jsFun(value, config) {
 正则步骤只处理上一步结果，不会在执行到一半时重新读取原始内容。正则编译失败时保留输入值。
 
 !!! note "字段 JS 与请求 / 响应 JS 不是同一个入口"
-    `<js>...</js>` 用于 URL 和其他普通字段，参数是 `value` 和 `config`，但不能用于 `request`、`response`。`request` 与 `response` 只使用 `@js:`：请求 JS 负责修改请求配置，响应 JS 使用 `html` 和 `config` 在字段提取前处理原始响应。响应入口详见[响应处理 - Javascript 规则](response.md)，Native 方法列表见 [Native to Javascript](../native-to-js.md)。
+    `<js>...</js>` 用于 URL 和其他普通字段，参数是 `value` 和 `config`，但不能用于 `request`、`response`。`request` 与 `response` 只使用 `@js:`：请求 JS 负责修改请求配置，响应 JS 使用 `html` 和 `config` 在字段提取前处理原始响应。请求入口详见[请求信息](request.md)，响应入口详见[响应信息](response.md)，Native 方法列表见 [Native to Javascript](../native-to-js.md)。
 
 ## URL规则
 

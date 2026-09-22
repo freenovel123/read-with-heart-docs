@@ -31,7 +31,7 @@
 | `importUrl` | 导入书籍地址时使用的 URL 匹配或转换规则 |
 | `method` / `params` / `header` | 请求方法、参数和场景请求头 |
 | `preRequests` | 正式详情请求前的前置请求 |
-| `request` / `response` | 请求配置 JS 与响应预处理 JS，只使用 `@js:` |
+| `request` / `response` | 请求配置 JS 与响应预处理 JS，只使用 `@js:`，详见[请求信息](request.md)、[响应信息](response.md) |
 
 ## 地址传递
 

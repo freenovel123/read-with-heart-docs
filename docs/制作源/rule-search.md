@@ -26,7 +26,7 @@
 | `pageMax` | 否 | 最大搜索页数规则 |
 | `method` / `params` / `header` | 否 | 请求方法、参数和场景请求头 |
 | `preRequests` | 否 | 搜索正式请求前的前置请求 |
-| `request` / `response` | 否 | 请求配置 JS 与响应预处理 JS，只使用 `@js:` |
+| `request` / `response` | 否 | 请求配置 JS 与响应预处理 JS，只使用 `@js:`，详见[请求信息](request.md)、[响应信息](response.md) |
 
 ## 地址传递
 

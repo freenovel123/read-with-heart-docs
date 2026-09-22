@@ -64,7 +64,7 @@
 | `mode` | String | `http` | 请求模式，常用 `http`；需要 WebView 加载时可使用 `webview`。 |
 | `header` | Object | 空 | 请求头，value 可使用规则语法。 |
 | `params` | Object | 空 | 请求参数，value 可使用规则语法。 |
-| `request` | String | 空 | 请求前处理规则，可用 `@js:` 动态修改请求配置。 |
+| `request` | String | 空 | 请求前处理规则，可用 `@js:` 动态修改请求配置，详见[请求信息](request.md)。 |
 | `response` | Object | 空 | 响应处理配置，见下方 `response` 字段。 |
 | `preRequestType` | Number | `0` | 前置请求类型：`0` 常规请求，`1` 浏览器过盾，`2` 图片验证码。 |
 | `requestEncode` | String | `utf-8` | 请求编码，常用 `utf-8`、`gbk`。 |
@@ -80,7 +80,7 @@
 | 字段 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | `engine` | String | `xpath` | `put` 解析使用的引擎，支持 `xpath`、`jsonpath`、`css`。 |
-| `respones` | String | 空 | 响应 JS 处理规则。注意字段名按现有协议写作 `respones`。 |
+| `respones` | String | 空 | 响应 JS 处理规则。注意字段名按现有协议写作 `respones`；只接受字符串返回值，详见[响应信息](response.md)。 |
 | `put` | Object | 空 | 数据提取字典，key 是保存名，value 是提取规则。 |
 
 `put` 的 value 会按 `engine` 解析：
@@ -319,7 +319,7 @@
 
 ### 先用 respones 转换响应再 put
 
-有些接口返回的数据需要先用 JS 解密、解包或整理，再交给 `put` 提取。
+有些接口返回的数据需要先用 JS 解密、解包或整理，再交给 `put` 提取。前置请求的 `respones` 与正式场景的 `response` 有两点差异：返回值只接受字符串，且不支持 `{{}}` 占位；完整规则见[响应信息](response.md)。
 
 ```json
 {

@@ -1,5 +1,14 @@
 # 更新日志
 
+## 2026-09-21
+
+### 「请求信息 / 响应信息」规则文档补全
+
+- 新增[制作源 → 请求信息（`@js:`）](制作源/request.md)：适用位置、触发条件、`config` 可写字段、返回值与合并规则、执行时序、变量替换、8 个案例与排错。
+- 重写[制作源 → 响应信息（`@js:`）](制作源/response.md)：包装函数与 `html` / `config` / `document` 参数、返回值与回退、正式场景与前置请求 `respones` 的差异、`{{}}` 占位、8 个案例与排错。
+- 导航调整：原「响应 JS 规则」入口拆为「规则说明」下的「请求信息」「响应信息」两条，与概述、搜索、详情、章节、正文并列；`rules-Introduction`、`rule-search`、`rule-detail`、`rule-chapter`、`rule-content`、`pre-request`、`native-to-js` 中 `request` / `response` 的说明统一指向这两页。
+- 明确三点易错行为：字段里没有 `@js:` 时 `request` / `response` 不会执行；`@js:` 中的 `config` 已经是对象，不要再写 `JSON.parse`；响应规则失败时静默回退原始响应。
+
 ## 2026-08-17
 
 ### 段评图标支持阅读主题颜色变量
